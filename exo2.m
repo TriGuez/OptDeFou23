@@ -1,14 +1,22 @@
 clear
 close all
 
-obj = (imread("ENSSAT_1750x1750.jpg"));
-obj = double(obj(:,:,1)./255);
+obj = (imread("ENSSAT_1750x1750","jpg"));
+obj = double(obj(:,:,1))/255;
 
-dx = 1e-6;
-dy = 1e-6;
+dx = 1e-4;
+dy = 1e-4;
 [M,N] = size(obj);
 x = (-M/2:M/2-1)*dx;
 y = (-N/2:N/2-1)*dy;
+W = M*dx;
+H = N*dy;
+dfx = 1/W;
+dfy = 1/H;
+fx = (-M/2:M/2-1)*dfx;
+fy = (-N/2:N/2-1)*dfy;
+[Fx, Fy] = meshgrid(fx, fy);
+
 
 imagesc(x*1e3,y*1e3,obj)
 colormap gray
@@ -17,50 +25,39 @@ title('Image initiale')
 xlabel('x (mm)')
 ylabel('y (mm)')
 
-S = fftshift(fft2(obj)./(M*N));
-W = dx*M;
-H = dy*N;
-
-dfx = 1/W;
-dfy = 1/H;
-
-fx = (-M/2:M/2-1)*dfx;
-fy = (-N/2:N/2-1)*dfy;
+ampSpectrum = fftshift(fft2(obj));
+Spectrum = abs(ampSpectrum).^2;
+Spectrum = Spectrum./(max(max(Spectrum)));
 
 figure()
-imagesc(fx*1e-3,fy*1e-3,log(abs(S).^2))
+imagesc(fx/1e3,fy/1e3,log(Spectrum))
 colormap gray
 axis equal
-xlabel('fx (1/mm)')
-ylabel("fy (1/mm)")
-title("Spectre de Fourier de l'objet initial")
-
+title('Spectre image initiale')
+xlabel('fx (mm^{-1})')
+ylabel('fy (mm^{-1})')
 
 lambda = 500e-9;
-k0 = 2*pi/lambda;
-fpA = 1;
-xf = lambda.*fpA.*fx;
-yf = lambda.*fpA.*fy;
-[Xf,Yf] = meshgrid(xf,yf);
-masque = HorSlit(Xf,Yf,0,10e-3);
-kappa1 = (exp(1i*k0*fpA)./(1i*lambda*fpA));
-ImF = kappa1.*S;
+fa =1;
+fb = 0.1;
+xF = fx*lambda*fa;
+yF = fy*lambda*fa;
 
-figure()
-imagesc(xf*1e3,yf*1e3,log(abs(ImF)).^2)
-colormap gray
-xlabel('xf (mm)')
-ylabel("yf (mm)")
-title("Image dans le plan de Fourier du montage 4f")
+Filtre1 = HorSlit(Fx,Fy,0,400);
+Filtre2 = VertSlit(Fx,Fy,0,400);
+Filtre3 = Filtre1.*Filtre2;
+Filtre4 = HorSlit(Fx,Fy,0,800).*VertSlit(Fx,Fy,0,800);
+Filtre5 = Filtre4.*AntiSquare(Fx,Fy,0,0,250);
+Filtre6 = Filtre2.*AntiSquare(Fx, Fy, 0,0,250);
+Filtre7 = Filtre1.*AntiSquare(Fx, Fy, 0,0,250);
 
-fpB = 10e-3;
-x4 = fx.*fpB.*lambda;
-y4 = fy.*fpB.*lambda;
-kappa2 = (exp(1i*k0*fpB)./(1i*lambda*fpB));
-IM = fft2(fftshift(masque.*ImF.*kappa2)./(M*N));
+Filt_ampSpectrum = Filtre7.*ampSpectrum;
+ampImage = (fft2(Filt_ampSpectrum));
+Image = abs(ampImage).^2;
+Image = Image./(max(max(Image)));
+x_im = (fb/fa)*x;
+y_im = (fb/fa)*y;
 figure()
-imagesc(x4*1e3,y4*1e3,abs(IM).^2)
 colormap gray
-xlabel('x4 (mm)')
-ylabel("y4 (mm)")
-title("Image dans le plan focal de la lentille B")
+axis equal
+imagesc(-x_im/1e-3,-y_im/1e-3,Image)
