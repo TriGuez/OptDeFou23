@@ -1,3 +1,6 @@
+clear
+close all
+
 % Définition du nombre de points de l'image :
 
 M = 2^9; % 512 points, à modifier uniquement par puissances de 2
@@ -61,7 +64,7 @@ S = fftshift(fft2(T)./(M*N));
 % Affichage :
 
 figure()
-imagesc(fx,fy,abs(S).^2)
+imagesc(fx,fy,(abs(S).^2))
 xlabel('fx $(m^{-1})$', 'Interpreter','latex','FontSize',14)
 ylabel('fy $(m^{-1})$', 'Interpreter','latex','FontSize',14)
 title('Spectre de Fourier de l''image initiale', "FontSize",16)
@@ -89,5 +92,5 @@ figure()
 imagesc(fx,fy,abs(S).^2)
 xlabel('fx $(m^{-1})$', 'Interpreter','latex','FontSize',14)
 ylabel('fy $(m^{-1})$', 'Interpreter','latex','FontSize',14)
-title('Spectre de Fourier de l''image initiale', "FontSize",16)
+title('Spectre de Fourier de l''image binaire', "FontSize",16)
 colormap gray
