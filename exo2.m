@@ -63,7 +63,7 @@ ylabel('fy (mm^{-1})')
 % Fourier. On remarque bien une focalisation.
 
 figure()
-imagesc(xF/1e-3,yF/1e-3,(Spectrum))
+imagesc(xF/1e-3,yF/1e-3,log(Spectrum))
 colormap gray
 title('Spectre image initiale (domaine spatial)')
 xlabel('xF (mm)')
