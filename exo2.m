@@ -63,7 +63,7 @@ ylabel('fy (mm^{-1})')
 % Fourier. On remarque bien une focalisation.
 
 figure()
-imagesc(xF/1e-3,yF/1e-3,(Spectrum))
+imagesc(xF/1e-3,yF/1e-3,log(Spectrum))
 colormap gray
 title('Spectre image initiale (domaine spatial)')
 xlabel('xF (mm)')
@@ -73,22 +73,23 @@ ylabel('yF (mm)')
 % l'objet initial. On peut définir ces masques soit suivant les fréquences
 % spatiales, et donc définir leurs dimensions en 1/m, ou dans le domaine
 % spatial, et donc leurs dimensions en m
-Filtre1 = HorSlit(Fx,Fy,0,400);
-Filtre2 = VertSlit(Fx,Fy,0,400);
+Filtre0 = ones(size(obj)); % pas de filtre 
+Filtre1 = HorSlit(Xf,Yf,0,2e-4);
+Filtre2 = VertSlit(Xf,Yf,0,2e-4);
 Filtre3 = Filtre1.*Filtre2;
-Filtre4 = HorSlit(Fx,Fy,0,800).*VertSlit(Fx,Fy,0,800);
-Filtre5 = Filtre4.*AntiSquare(Fx,Fy,0,0,250);
-Filtre6 = Filtre2.*AntiSquare(Fx, Fy, 0,0,250);
-Filtre7 = Filtre1.*AntiSquare(Fx, Fy, 0,0,250);
-Filtre8 = -1*(1-AntiSquare(Fx,Fy,0,0,1600)).*AntiSquare(Fx,Fy,0,0,800);
+Filtre4 = HorSlit(Xf,Yf,0,4e-4).*VertSlit(Xf,Yf,0,4e-4);
+Filtre5 = Filtre4.*AntiSquare(Xf,Yf,0,0,1.25e-4);
+Filtre6 = Filtre2.*AntiSquare(Xf,Yf,0,0,1.25e-4);
+Filtre7 = Filtre1.*AntiSquare(Xf,Yf,0,0,1.25e-4);
+Filtre8 = -1*(1-AntiSquare(Xf,Yf,0,0,8e-4)).*AntiSquare(Xf,Yf,0,0,4e-4);
 
 % On applique le filtre sélectionné au spectre de Fourier de l'objet
 % initial.
-Filt_ampSpectrum = Filtre1.*ampSpectrum;
+Filt_ampSpectrum = Filtre0.*ampSpectrum;
 
 % On affiche le spectre de Fourier filtré
 figure()
-imagesc(fx/1e3,fy/1e3,log(abs(Filt_ampSpectrum).^2))
+imagesc(xF/1e-3,yF/1e-3,log(abs(Filt_ampSpectrum).^2))
 colormap gray
 title('Spectre image initiale')
 xlabel('fx (mm^{-1})')

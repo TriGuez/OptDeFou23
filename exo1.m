@@ -3,7 +3,7 @@ close all
 
 % Définition du nombre de points de l'image :
 
-M = 2^9; % 512 points, à modifier uniquement par puissances de 2
+M = 2^4; % 512 points, à modifier uniquement par puissances de 2
 N = M; % On cherche ici à obtenir une image carrée, donc on fixe le même nombre de points
 
 % Définition des axes x & y :
